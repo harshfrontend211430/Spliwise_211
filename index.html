@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" type="text/css" href="styles.css">
+  <meta charset="UTF-8">
+  <title>Split-it</title>
+  <style>
+    /* styles.css */
+    .box-table {
+      display: table;
+      margin-top: 20px;
+      border-collapse: collapse;
+      width: 100%;
+    }
+
+    .box-table-row {
+      display: table-row;
+    }
+
+    .box-table-cell {
+      display: table-cell;
+      border: 1px solid black;
+      padding: 10px;
+      text-align: center;
+    }
+
+    /* Additional styles for better presentation */
+    body {
+      font-family: Arial, sans-serif;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    #num_persons {
+      padding: 5px;
+      width: 50px;
+    }
+
+    #para1 {
+      text-align: center;
+    }
+
+    button {
+      display: block;
+      margin: 20px auto;
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    p strong {
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    #output {
+      margin-top: 30px;
+    }
+    .box-table-cell {
+  display: table-cell;
+  border: 1px solid black;
+  padding: 10px;
+  text-align: center;
+  background-color: white;
+  color: black;
+  font-weight: bold;
+}
+
+  </style>
+</head>
+<body>
+  <h1 id="heading1">SPLIT-IT</h1>
+  <p id="para1">Enter the Number of Persons:</p>
+  <input type="text" id="num_persons">
+  <br><br>
+  <button onclick="getDebts()">Submit</button>
+
+  <script>
+    function getDebts() {
+      const num_persons = parseInt(document.getElementById("num_persons").value);
+      const graph = new Array(num_persons).fill().map(() => new Array(num_persons).fill(0));
+      const names = [];
+
+      for (let i = 0; i < num_persons; i++) {
+        const name = prompt(`Enter name for person ${i + 1}:`);
+        names.push(name);
+      }
+
+      for (let i = 0; i < num_persons; i++) {
+        for (let j = 0; j < num_persons; j++) {
+          if (i !== j) {
+            const debt = prompt(`How much did ${names[i]} Pay to ${names[j]}?`);
+            graph[i][j] = parseInt(debt);
+          }
+        }
+      }
+
+      const result = document.createElement("p");
+      result.innerHTML = "<strong>Payment:</strong>";
+      document.body.appendChild(result);
+
+      const amount = new Array(num_persons).fill(0);
+      for (let p = 0; p < num_persons; p++) {
+        for (let i = 0; i < num_persons; i++) {
+          amount[p] += (graph[i][p] - graph[p][i]);
+        }
+      }
+
+      const output = document.createElement("div");
+      output.id = "output";
+      document.body.appendChild(output);
+
+      minCashFlowRecursion(amount, names, output);
+    }
+
+    function get_Minimum(array, size) {
+      let min_Index = 0;
+      for (let i = 1; i < size; i++) {
+        if (array[i] < array[min_Index])
+          min_Index = i;
+      }
+      return min_Index;
+    }
+
+    function get_Maximum(array, size) {
+      let max_Index = 0;
+      for (let i = 1; i < size; i++) {
+        if (array[i] > array[max_Index])
+          max_Index = i;
+      }
+      return max_Index;
+    }
+
+    function minimum_of_two(number1, number2) {
+      if (number1 < number2)
+        return number1;
+      else
+        return number2;
+    }
+
+    function minCashFlowRecursion(amount, names, output) {
+      let maxCredit = get_Maximum(amount, amount.length);
+      let maxDebit = get_Minimum(amount, amount.length);
+      if (amount[maxCredit] === 0 && amount[maxDebit] === 0)
+        return;
+
+      let minimum = minimum_of_two(-amount[maxDebit], amount[maxCredit]);
+      amount[maxCredit] -= minimum;
+      amount[maxDebit] += minimum;
+
+      // Create the box table
+      const table = document.createElement("div");
+      table.className = "box-table";
+      output.appendChild(table);
+
+      // Add the payment details as table rows
+      const row = document.createElement("div");
+      row.className = "box-table-row";
+      table.appendChild(row);
+
+      const cell1 = document.createElement("div");
+      cell1.className = "box-table-cell";
+      cell1.textContent = `${names[maxCredit]}`;
+      row.appendChild(cell1);
+
+      const cell2 = document.createElement("div");
+      cell2.className = "box-table-cell";
+      cell2.textContent = `pays ${minimum} to`;
+      row.appendChild(cell2);
+
+      const cell3 = document.createElement("div");
+      cell3.className = "box-table-cell";
+      cell3.textContent = `${names[maxDebit]}`;
+      row.appendChild(cell3);
+
+      minCashFlowRecursion(amount, names, output);
+    }
+  </script>
+</body>
+</html>
